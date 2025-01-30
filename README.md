@@ -4,6 +4,12 @@
 
 SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membantu admin dan dokter dalam mengelola data pasien, mencatat rekam medis, serta mencari kode diagnosis penyakit menggunakan integrasi dengan ICD API WHO. Aplikasi ini dirancang untuk mendukung proses pendaftaran pasien dan pencatatan diagnosa secara akurat dengan fitur statistik untuk analisis lebih lanjut.
 
+# Catatan :
+
+- Aplikasi debug.apk mungkin akan mengalami masalah ketika diinstal, harap kosongkan space hp
+- Apabila masih tidak bisa menginstall harap coba jalankan codingan di VSCode ataupun Android Studio
+- Terimas kasih banyak
+
 # Akun Login
 
 1. Dokter 1:
