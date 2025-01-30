@@ -27,7 +27,6 @@ class AdminPageState extends State<AdminPage> {
 
   void onSearch() {
     final query = _searchController.text.trim();
-
     patientBloc.add(SearchPatientByName(query));
   }
 
@@ -35,12 +34,10 @@ class AdminPageState extends State<AdminPage> {
     patientBloc.add(DeletePatient(patientId));
   }
 
-  void onEdit(int patientId) {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appbarAdmin(),
+      appBar: appbarAdmin(context),
       body: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -63,8 +60,6 @@ class AdminPageState extends State<AdminPage> {
                   }
                   if (state is PatientLoaded) {
                     final data = state.combinedData;
-
-                    print('data :: ${data.first}');
                     if (data.isEmpty) {
                       return Center(child: Text('No data found.'));
                     }
@@ -73,27 +68,38 @@ class AdminPageState extends State<AdminPage> {
                         itemBuilder: (context, index) {
                           final datas = data[index];
 
-                          return paddingData(
+                          return paddingDataAdmin(
+                              () {
+                                datas.user?.role != "Admin" &&
+                                        datas.user?.role != "Doctor"
+                                    ? Get.to(() => AddPatientDoctorPage(
+                                        patient: datas.patient!))
+                                    : print('admin doktor');
+                              },
                               datas.user?.role == "Admin"
                                   ? AssetsHelper.icAdmin
                                   : datas.user?.role == "Doctor"
                                       ? AssetsHelper.icDokter
                                       : AssetsHelper.icPasien,
                               datas.patient?.name ?? datas.user?.name ?? '',
-                              datas.user?.role ?? 'Patient', () {
-                            Get.to(() => EditPasienPage(
-                                  combine: datas,
-                                ));
-                            // print('datas edit :: ${datas.toJson()}');
-                          }, () {
-                            datas.user?.role == "Admin" ||
-                                    datas.user?.role == "Doctor"
-                                ? onDelete(datas.user?.id ?? 0)
-                                : onDelete(datas.patient!.id);
-                          });
+                              datas.user?.role ?? 'Patient',
+                              () {
+                                Get.to(() => EditPasienPage(
+                                      combine: datas,
+                                    ));
+                              },
+                              () {
+                                showMyDialog(context, 'Delete?',
+                                    'Are you sure want to delete this data?',
+                                    () {
+                                  datas.user?.role == "Admin" ||
+                                          datas.user?.role == "Doctor"
+                                      ? onDelete(datas.user?.id ?? 0)
+                                      : onDelete(datas.patient!.id);
+                                });
+                              });
                         });
                   }
-
                   return Center(child: CircularProgressIndicator());
                 },
               ),

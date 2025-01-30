@@ -166,7 +166,89 @@ paddingData(String assets, String titleNama, String role, Function() funcEdit,
   );
 }
 
-appbarAdmin() {
+paddingDataAdmin(Function() funcTap, String assets, String titleNama,
+    String role, Function() funcEdit, Function() funcDel) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: 10),
+    child: Column(
+      children: [
+        InkWell(
+          onTap: funcTap,
+          child: Container(
+            width: Get.width,
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(width: 0.7, color: Colors.black87)),
+                  child: Image.asset(
+                    assets,
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                wbox(15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      titleNama,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                    hbox(4),
+                    Text(
+                      role,
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        InkWell(
+                          onTap: funcEdit,
+                          child: Image.asset(
+                            AssetsHelper.icEditing,
+                            height: 20,
+                            width: 20,
+                          ),
+                        ),
+                        wbox(10),
+                        InkWell(
+                          onTap: funcDel,
+                          child: Image.asset(
+                            AssetsHelper.icBin,
+                            height: 20,
+                            width: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        Divider(
+          thickness: 1,
+          color: Colors.grey[400],
+          indent: 90,
+        )
+      ],
+    ),
+  );
+}
+
+appbarAdmin(BuildContext context) {
   return AppBar(
     actions: [
       InkWell(
@@ -183,7 +265,10 @@ appbarAdmin() {
         padding: EdgeInsets.only(right: 10),
         child: InkWell(
           onTap: () {
-            Get.offAll(() => LoginScreen());
+            showMyDialog(
+                context, "Logout", 'Are you sure want to exit the app?', () {
+              Get.offAll(() => LoginScreen());
+            });
           },
           child: Icon(
             Icons.logout,
@@ -288,5 +373,31 @@ paddingListPasien(PatientWithHistory patient, Function() func) {
         ),
       ],
     ),
+  );
+}
+
+Future<void> showMyDialog(BuildContext context, String title, String subtitle,
+    Function() funcYes) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(subtitle),
+        actions: <Widget>[
+          TextButton(
+            child: Text('No'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            child: Text('Yes'),
+            onPressed: funcYes,
+          ),
+        ],
+      );
+    },
   );
 }

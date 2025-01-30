@@ -3,14 +3,15 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 import '../../../core.dart';
 
-class AddPatientPage extends StatefulWidget {
-  const AddPatientPage({super.key});
+class AddPatientDoctorPage extends StatefulWidget {
+  final Patient patient;
+  const AddPatientDoctorPage({super.key, required this.patient});
 
   @override
-  State<AddPatientPage> createState() => _AddPatientPageState();
+  State<AddPatientDoctorPage> createState() => _AddPatientDoctorPageState();
 }
 
-class _AddPatientPageState extends State<AddPatientPage> {
+class _AddPatientDoctorPageState extends State<AddPatientDoctorPage> {
   PatientBloc patientBloc = PatientBloc(PatientRepository());
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
@@ -27,6 +28,7 @@ class _AddPatientPageState extends State<AddPatientPage> {
   @override
   void initState() {
     super.initState();
+    _nameController.text = widget.patient.name;
     callData();
   }
 
@@ -64,11 +66,11 @@ class _AddPatientPageState extends State<AddPatientPage> {
     }
 
     Random random = Random();
-    int id = random.nextInt(1500) * 50;
+
     int record = random.nextInt(1500) * 50;
 
     final newPatient = Patient(
-      id: id,
+      id: widget.patient.id,
       recordNumber: record,
       name: name,
       birth: '',

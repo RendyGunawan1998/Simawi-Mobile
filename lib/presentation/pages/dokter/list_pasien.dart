@@ -26,19 +26,15 @@ class DoctorPatientPageState extends State<DoctorPatientPage> {
       appBar: AppBar(
         title: Text('Patients for Doctor'),
         actions: [
-          // InkWell(
-          //     onTap: () {
-          //       dokterBloc.add(LoadPatientsForDoctorEvent(widget.doctorId));
-          //     },
-          //     child: Icon(
-          //       Icons.refresh,
-          //       color: Colors.red,
-          //     )),
           Padding(
             padding: EdgeInsets.only(right: 15),
             child: InkWell(
                 onTap: () {
-                  Get.offAll(() => LoginScreen());
+                  showMyDialog(
+                      context, "Logout", 'Are you sure want to exit the app?',
+                      () {
+                    Get.offAll(() => LoginScreen());
+                  });
                 },
                 child: Icon(
                   Icons.logout,
