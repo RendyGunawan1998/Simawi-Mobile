@@ -229,7 +229,7 @@ appbarAdmin(BuildContext context) {
             },
             child: Icon(
               Icons.logout,
-              color: Colors.blue,
+              color: Colors.red,
             ),
           ),
         ),

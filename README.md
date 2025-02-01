@@ -2,13 +2,13 @@
 
 # Deskripsi Aplikasi
 
-SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membantu admin dan dokter dalam mengelola data pasien, mencatat rekam medis, serta mencari kode diagnosis penyakit menggunakan integrasi dengan ICD API WHO. Aplikasi ini dirancang untuk mendukung proses pendaftaran pasien dan pencatatan diagnosa secara akurat dengan fitur statistik untuk analisis lebih lanjut.
+SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membantu admin dan dokter dalam mengelola data pasien, mencatat rekam medis, serta mencari kode diagnosis penyakit menggunakan integrasi dengan ICD API WHO. Aplikasi ini dirancang untuk mendukung proses pendaftaran pasien dan pencatatan diagnosa secara akurat dengan fitur statistik untuk analisis lebih lanjut. "SIMAWI MOBILE" dikembangkan dengan design yang user-friendly mengingat admin dan dokter yang bekerja memerlukan aplikasi yang mudah digunakan dan responsive. Design yang dikembangkan ini memudahkan admin ataupun dokter untuk mencari fitur yang diperlukan secara cepat dan tidak membuang banyak waktu.
 
 # Catatan :
 
-- Aplikasi debug.apk mungkin akan mengalami masalah ketika diinstal, harap kosongkan space hp
+- Aplikasi debug.apk mungkin akan mengalami masalah ketika diinstal, harap kosongkan space handphone
 - Apabila masih tidak bisa menginstall harap coba jalankan codingan di VSCode ataupun Android Studio
-- Terimas kasih banyak
+- Terima kasih banyak
 
 # Akun Login
 
@@ -30,6 +30,7 @@ SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membant
 
 - Statistik jumlah pasien yang terdaftar.
 - 5 kode diagnosis ICD-10 terpopuler dalam bentuk pie chart.
+- Jumlah pasien yang terdaftar
 
 2. Manajemen Data User (Admin)
 
@@ -39,9 +40,7 @@ SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membant
 - Tambah pasien baru atau gunakan data pasien lama.
 - Pilih dokter yang akan menangani pasien.
 
-3. Tampil Data Dashboard (Admin)
-
-4. Rekam Medis (Dokter)
+3. Rekam Medis (Dokter)
 
 - Catat gejala pasien, diagnosa awal,keluhan dan pencarian kode ICD-10 melalui integrasi API WHO.
 - Simpan dan tampilkan detail rekam medis pasien.
@@ -50,7 +49,8 @@ SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membant
 
 - BASE URL : https://id.who.int/icdapi
 - URL GET ACCESS TOKEN : https://icdaccessmanagement.who.int/connect/token
-- URL ENTITY ICD-10 : https://id.who.int/icd/entity/search?q=
+- URL ENTITY ICD-10 : https://id.who.int/icd/entity/search?q={search}
+- URL ENTITY DETAIL ICD-10 : https://id.who.int/icd/entity/{id}
 
 # Catatan Teknis dan Kendala Selama Pengembangan
 
@@ -62,51 +62,51 @@ SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membant
 1. User Login sebagai Admin
 
 - Untuk login admin menggunakan : admin@example.com sebagai email, dan admin123 untuk password
-- User akan diarahkan kedalam halaman utama admin yang memunculkan data user
-- Admin dapat berperan untuk menambahkan user atau mencarikan dokter untuk pasien yang sudah terdaftar
-  -Apabila user belum memiliki akun, admin akan membuat akun dengan meng-klik button "+Tambah Pasien baru" lalu akan diarahkan kehalaman Add Pasien
+- Admin akan diarahkan kedalam halaman utama admin yang memunculkan data user
+- Admin dapat berperan untuk menambahkan pasien atau mencarikan dokter untuk pasien yang sudah terdaftar
+- Pasien datang kepada admin untuk mendaftar
+- Apabila pasien belum memiliki akun, admin akan membuat akun dengan meng-klik button "+Tambah Pasien baru" lalu akan diarahkan kehalaman Add Pasien
 - Admin memasukkan data diri pasien
-- Pada saat mengisi "Diagnosis" (Contoh : "Fever"), admin harus meng-klik icon cari agar menampilkan dropdown yang berisi diagnosa dari ICD-10 WHO
 - Setelah semua data terisi, admin harus mengklik "Add Patient"
 
 * Untuk pasien lama
 
-- Admin cukup mencari nama pasien pada halaman "Admin - Patient Management" dengan fitur yang memiliki label "Search By name" kemudian klik icon Cari
-- Admin klik data pasien yang muncul dan akan diarahkan seperti saat menginputkan data baru pasien namun field nama pasien sudah terisi untuk halaman ini
-- Admin mengisikan data-data pasien seperti saat pengisiin data pasien baru
-- Setelah semua data selesai diisikan, admin klik "Add Patient"
+- Admin mencari nama pasien pada halaman "Patient Management - Admin" dengan fitur pencarian yang memiliki label "Search by name" kemudian klik icon Cari
+- Sistem akan memunculkan data pasien yang dicari
+- Admin klik data pasien yang muncul. Admin klik button "+Pilih Dokter" dan akan diarahkan ke halaman "Appointment Doctor - Admin"
+- Admin mengisikan data-data pasien seperti gejala yang dirasakan, diganosis awal penyakit, serta memilihkan dokter untuk pasien.
+- Admin dapat melihat data pasien secara lengkap pada box data diri pasien dengan mengklik "+See More"
+- Setelah semua data selesai diisikan, admin klik "Add Doctor"
 
 * Hapus data pasien
 
-- Admin cukup mengklik Icon "Keranjang Sampah" pada bagian bawah data user yang menampilkan role
+- Admin menekan Icon "Keranjang Sampah" pada bagian bawah data user yang menampilkan role
 - Akan muncul pop-up ketika Admin mengklik tombol tersebut dan klik saja "Yes" maka data pasien akan terhapus
 
 * Edit Data Pasien/User
 
-- Admin cukup mengklik Icon "Pensil Kertas" pada bagian bawah data user yang menampilkan role
-- Admin akan diarahkan kehalaman pengisiin data user
-- Data yang belum terisi berupa umur, gender, Examination Data/Tanggal Kehadiran, serta diagnosis
-- Untuk diagnosis ICD-10 harap klik icon "Lensa/Pencarian", maka akan memunculkan data dropdown untuk jenis diagnosa penyakit
-- Setelah semua data terisi, Klik "Update Patient"
+- Admin menekan Icon "Pensil Kertas" pada bagian bawah data user yang menampilkan role
+- Admin akan diarahkan kehalaman "Update Patient - Admin"
+- Admin dapat mengubah data pasien yang diperlukan
+- Setelah semua data terisi, Klik button "Update Patient"
 
 2. User Login sebagai Dokter
 
 - Untuk login sebagai Dokter menggunakan : doctor@example.com sebagai email, dan doctor123 untuk password
-- User akan diarahkan kedalam halaman utama Dokter yang memunculkan data pasien
-- Data pasien yang ditampilkan adalah data yang dimasukkan admin berdasarkan dokter yang dipilihkan
-- Dokter dapat mengklik data pasien untuk diarahakan kedalam halaman membuat rekam medis
-- Dokter akan mengisikan keluhan berdasarkan keterangan pasien, lalu dokter akan memasukkan diagnosa awal
-- Setelah dokter mengisikan diagnosa awal (Contoh : Fever), dokter meng-klik icon cari dan akan muncul menu dropdown yang berisi diagnosa dari ICD-10 WHO
-- Setelah dokter memilih ICD, akan muncul tombol baru "Tampilkan Deksripsi Penyakit"
-- Sistem akan menampilkan deskripsi penyakit, judul, dan data lainnya
+- User akan diarahkan kedalam halaman utama "List Patient - Dokter" yang memunculkan data pasien
+- Data pasien yang ditampilkan adalah data yang dimasukkan admin berdasarkan dokter yang dipilih untuk pasien tersebut
+- Dokter dapat menekan data pasien untuk diarahakan kedalam halaman "Rekam Medis - Doctor"
+- Dokter akan mengecek keluhan berdasarkan keterangan pasien, lalu dokter akan memasukkan data tambahan pada form keluhan dan form diagnosa
+- Setelah dokter mengisikan diagnosa (Contoh : Fever), dokter meng-klik icon cari dan akan muncul menu dropdown yang berisi diagnosa dari ICD-10 WHO
+- Setelah dokter memilih ICD, sistem akan menampilkan deskripsi penyakit, judul, dan data lainnya
 - Setelah dokter selesai melakukan tindakan rekam medis, klik "Save Rekam Medis" agar proses dapat selesai
 
 * Update Data Rekam Medis
 
 - Update rekam medis hanya dapat dilakukan pada pasien yang sudah pernah menjalani rekam medis
-- Pasien yang sudah pernah melakukan rekam medis akan memiliki tanda yang berbeda berupa Icon Centang yagn berwarna hijau dibawah "Record Number" miliknya
-- Dokter menekan data pasien yang memiliki icon centang hijau dan akan diarahakan ke halaman baru untuk memperbaharui data
-- Setelah dokter mengisi keluhan dan data lainnya seperti ketika melakukan rekam medis, dokter perlu menekan "Update Rekam Medis"
+- Pasien yang sudah pernah melakukan rekam medis akan memiliki tanda yang berbeda berupa Icon Centang berwarna hijau dengan teks "Patient already done diagnose" dibawah "Record Number" pasien
+- Dokter menekan data pasien yang memiliki icon centang hijau dan akan diarahakan ke halaman "Update Rekam Medis - Doctor" untuk memperbaharui data
+- Setelah dokter memperbaharui data seperti ketika melakukan rekam medis, dokter menekan "Update Rekam Medis"
 
 # Logout
 
@@ -118,6 +118,8 @@ SIMAWI Mobile adalah aplikasi manajemen rumah sakit berbasis mobile yang membant
 
 - Dashboard hanya dapat diakses oleh admin
 - Admin perlu melakukan proses "Login"
-- Admin akan diarahkan kehalaman "Admin - Patient Management"
+- Admin akan diarahkan kehalaman "Patient Management - Admin"
 - Pada bagian Appbar/Atas aplikasi akan terdapat 2 icon pada pojok kanan atas
 - 1 Icon untuk logout, dan 1 lagi icon berbentuk Kotak yang akan mengarahkan ke halaman "Dashboard"
+- Admin menekan icon berbentuk kotak dan sistem akan mengarahkan kehalaman "Dashboard - Admin"
+- Sistem menampilkan 5 kode Diagnosis ICD-10 yang paling banyak digunakan, jumlah pasien yang terdaftar, serta pasien saat ini
