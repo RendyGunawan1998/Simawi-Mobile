@@ -17,11 +17,13 @@ class ICDAPIProvider {
         },
       );
       print('RES S.CODE :: ${response.statusCode}');
+      print('RES S.BODY :: ${response.body}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final results = (data['destinationEntities'] as List)
-            .map((item) => DestinationEntity.fromJson(item))
-            .toList();
+                .map((item) => DestinationEntity.fromJson(item))
+                .toList() ??
+            [];
         return results;
       } else {
         throw Exception('FAIL FETCH ICD DATA, S.CODE :: ${response.body}');
@@ -97,8 +99,8 @@ class ICDAPIProvider {
       phone: '',
       address: '',
       bloodType: '',
-      weight: 0.0,
-      height: 0.0,
+      weight: '',
+      height: '',
       createdAt: date,
       updatedAt: DateTime.now().toIso8601String(),
     );

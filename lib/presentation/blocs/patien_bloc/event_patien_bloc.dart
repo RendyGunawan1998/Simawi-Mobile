@@ -11,27 +11,35 @@ class LoadPatients extends PatientEvent {}
 
 class AddPatient extends PatientEvent {
   final Patient patient;
-  final int doctorId;
-  final int adminId;
-  final String diagnosa;
-  final String dateVisit;
 
-  const AddPatient(
-      this.patient, this.doctorId, this.adminId, this.diagnosa, this.dateVisit);
+  const AddPatient(this.patient);
 
   @override
-  List<Object?> get props => [patient, doctorId];
+  List<Object?> get props => [patient];
+}
+
+class UpdateUserEvent extends PatientEvent {
+  final UserModel user;
+
+  const UpdateUserEvent(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+class AddAppointmentPatient extends PatientEvent {
+  final PatientHistory appointment;
+
+  const AddAppointmentPatient(this.appointment);
+
+  @override
+  List<Object?> get props => [appointment];
 }
 
 class UpdatePatient extends PatientEvent {
   final Patient patient;
-  final int doctorId;
-  final int adminId;
-  final String diagnosa;
-  final String dateVisit;
 
-  const UpdatePatient(
-      this.patient, this.doctorId, this.adminId, this.diagnosa, this.dateVisit);
+  const UpdatePatient(this.patient);
 
   @override
   List<Object?> get props => [patient];

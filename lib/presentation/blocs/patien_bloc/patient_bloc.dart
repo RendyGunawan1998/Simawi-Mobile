@@ -7,7 +7,9 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
   PatientBloc(this.patientRepository) : super(PatientInitial()) {
     on<LoadPatients>(_onLoadPatients);
     on<AddPatient>(_onAddPatient);
+    on<AddAppointmentPatient>(_onAddAppointmentPatient);
     on<UpdatePatient>(_onUpdatePatient);
+    on<UpdateUserEvent>(_onUpdateUserData);
     on<DeletePatient>(_onDeletePatient);
     on<SearchPatientByName>(_onSearchPatientByName);
   }
@@ -47,9 +49,21 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
     AddPatient event,
     Emitter<PatientState> emit,
   ) async {
+    emit(PatientLoading());
     try {
-      await patientRepository.addPatient(event.patient, event.doctorId,
-          event.adminId, event.diagnosa, event.dateVisit);
+      await patientRepository.addPatient(event.patient);
+      add(LoadPatients());
+    } catch (e) {
+      emit(PatientError(e.toString()));
+    }
+  }
+
+  Future<void> _onAddAppointmentPatient(
+    AddAppointmentPatient event,
+    Emitter<PatientState> emit,
+  ) async {
+    try {
+      await patientRepository.addAppointmentPatient(event.appointment);
       add(LoadPatients());
     } catch (e) {
       emit(PatientError(e.toString()));
@@ -61,8 +75,19 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
     Emitter<PatientState> emit,
   ) async {
     try {
-      await patientRepository.updatePatient(event.patient, event.doctorId,
-          event.adminId, event.diagnosa, event.dateVisit);
+      await patientRepository.updatePatient(event.patient);
+      add(LoadPatients());
+    } catch (e) {
+      emit(PatientError(e.toString()));
+    }
+  }
+
+  Future<void> _onUpdateUserData(
+    UpdateUserEvent event,
+    Emitter<PatientState> emit,
+  ) async {
+    try {
+      await patientRepository.updateUser(event.user);
       add(LoadPatients());
     } catch (e) {
       emit(PatientError(e.toString()));

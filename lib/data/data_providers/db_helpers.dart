@@ -31,7 +31,7 @@ class DatabaseHelper {
     const textType = 'TEXT';
     const intType = 'INTEGER';
     const boolType = 'BOOLEAN';
-    const floatType = 'REAL';
+    // const floatType = 'REAL';
 
     await db.execute('''
     CREATE TABLE User (
@@ -55,8 +55,8 @@ class DatabaseHelper {
       Phone $textType,
       Address $textType,
       BloodType $textType,
-      Weight $floatType,
-      Height $floatType,
+      Weight $textType,
+      Height $textType,
       CreatedAt $textType,
       UpdatedAt $textType
     )
@@ -108,14 +108,12 @@ class DatabaseHelper {
     );
 
     if (existingHistory.isEmpty) {
-      // Insert if it doesn't exist
       await db.insert(
         'PatientHistory',
         data,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } else {
-      // Update the existing record if found
       await db.update(
         'PatientHistory',
         data,

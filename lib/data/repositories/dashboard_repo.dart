@@ -13,4 +13,20 @@ class DashboardRepo {
 
     return result.map((e) => ICD10Diagnosis.fromJson(e)).toList();
   }
+
+  Future<int> getPatientCount() async {
+    final db = await DatabaseHelper.instance.database;
+    var result = await db.rawQuery('SELECT COUNT(*) FROM Patient');
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  Future<List<Patient>> getRecentPatients() async {
+    final db = await DatabaseHelper.instance.database;
+    var result = await db.query(
+      'Patient',
+      orderBy: 'CreatedAt DESC',
+      limit: 5,
+    );
+    return result.map((json) => Patient.fromJson(json)).toList();
+  }
 }

@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import '../../core.dart';
 
 class PatientRepository {
@@ -43,6 +45,12 @@ class PatientRepository {
         whereArgs: ['%$name%'],
       );
 
+      final patientHistoryResults = await db.query(
+        'PatientHistory',
+        where: 'DateVisit LIKE ?',
+        whereArgs: ['%$name%'],
+      );
+
       List<CombinedUserPatient> combinedData = [];
 
       for (var patient in patientResults) {
@@ -56,6 +64,22 @@ class PatientRepository {
         final userModel = UserModel.fromMap(user);
         combinedData.add(CombinedUserPatient(user: userModel));
       }
+
+      for (var history in patientHistoryResults) {
+        final recordNumber = history['RecordNumber'];
+        final matchingPatient = await db.query(
+          'Patient',
+          where: 'RecordNumber = ?',
+          whereArgs: [recordNumber],
+        );
+
+        if (matchingPatient.isNotEmpty) {
+          final patientModel = Patient.fromJson(matchingPatient.first);
+          combinedData.add(CombinedUserPatient(
+            patient: patientModel,
+          ));
+        }
+      }
       print('list data search :: $combinedData');
       return combinedData;
     } catch (e) {
@@ -63,8 +87,7 @@ class PatientRepository {
     }
   }
 
-  Future<void> addPatient(Patient patient, int doctorId, int adminId,
-      String diagnosa, String dateVisit) async {
+  Future<void> addPatient(Patient patient) async {
     try {
       final db = await _databaseHelper.database;
       await db.insert('Patient', {
@@ -80,20 +103,53 @@ class PatientRepository {
         'CreatedAt': DateTime.now().toIso8601String(),
         'UpdatedAt': DateTime.now().toIso8601String(),
       });
-
-      await db.insert('PatientHistory', {
-        'RecordNumber': patient.recordNumber,
-        'DateVisit': dateVisit,
-        'RegisteredBy': adminId,
-        'ConsultationBy': doctorId,
-        'Symptoms': 'Tunggu Diagnosa',
-        'DoctorDiagnose': diagnosa,
-        'ICD10Code': 'Tunggu Kode ICD-10',
-        'ICD10Name': 'Tunggu Nama ICD-10',
-        'isDone': false,
-      });
     } catch (e) {
       throw Exception('Gagal menambahkan pasien: $e');
+    }
+  }
+
+  Future<void> addAppointmentPatient(PatientHistory patient) async {
+    try {
+      print('make appointment');
+      final db = await _databaseHelper.database;
+
+      var res = await db.insert('PatientHistory', {
+        'RecordNumber': patient.recordNumber,
+        'DateVisit': DateFormat('dd MMM yyyy').format(patient.dateVisit),
+        'RegisteredBy': 1,
+        'ConsultationBy': patient.consultationBy,
+        'Symptoms': patient.symptoms,
+        'DoctorDiagnose': patient.doctorDiagnose,
+        'ICD10Code': patient.icd10Code,
+        'ICD10Name': patient.icd10Name,
+        'isDone': false,
+      });
+
+      print('res :: $res');
+    } catch (e) {
+      print('Err appointment :: ${e.toString()}');
+      throw Exception('Gagal menambahkan pasien: $e');
+    }
+  }
+
+  Future<void> updateUser(UserModel user) async {
+    try {
+      final db = await _databaseHelper.database;
+      var res = await db.update(
+        'User',
+        {
+          'Name': user.name,
+          'Email': user.email,
+          'Password': user.password,
+          'UpdatedAt': DateTime.now().toIso8601String(),
+        },
+        where: 'ID = ?',
+        whereArgs: [user.id],
+      );
+      print('RES user :: $res');
+    } catch (e) {
+      print('Err update user :: ${e.toString()}');
+      throw Exception('Gagal update user: $e');
     }
   }
 
@@ -135,8 +191,9 @@ class PatientRepository {
     }
   }
 
-  Future<void> updatePatient(Patient patient, int doctorId, int adminId,
-      String diagnosa, String dateVisit) async {
+  Future<void> updatePatient(
+    Patient patient,
+  ) async {
     try {
       final db = await _databaseHelper.database;
 
@@ -156,21 +213,6 @@ class PatientRepository {
         },
         where: 'ID = ?',
         whereArgs: [patient.id],
-      );
-
-      await db.update(
-        'PatientHistory',
-        {
-          'DateVisit': dateVisit,
-          'ConsultationBy': doctorId,
-          'Symptoms': 'Tunggu Diagnosa',
-          'DoctorDiagnose': diagnosa,
-          'ICD10Code': 'Tunggu Kode ICD-10',
-          'ICD10Name': 'Tunggu Nama ICD-10',
-          'isDone': false,
-        },
-        where: 'RecordNumber = ?',
-        whereArgs: [patient.recordNumber],
       );
     } catch (e) {
       throw Exception('Gagal memperbarui data pasien: $e');
@@ -192,16 +234,17 @@ class PatientRepository {
 
   Future<List<PatientWithHistory>> getPatientsForDoctor(int doctorId) async {
     final db = await _databaseHelper.database;
+    print('doctorId :: $doctorId');
     final result = await db.query(
       'PatientHistory',
       where: 'ConsultationBy = ?',
       whereArgs: [doctorId],
     );
+    print('patientResult :: $result');
 
     List<PatientWithHistory> patientsWithHistory = [];
 
     for (var item in result) {
-      // Query untuk mendapatkan data detail pasien terkait
       final patientResult = await db.query(
         'Patient',
         where: 'RecordNumber = ?',

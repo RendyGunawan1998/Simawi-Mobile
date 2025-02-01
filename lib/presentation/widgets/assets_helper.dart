@@ -5,8 +5,8 @@ class AssetsHelper {
   static String icPasien = icon("ic_pasien.png");
   static String icBin = icon("bin.png");
   static String icEditing = icon("editing.png");
-// icons
-  // static String imgProfile = img("profile.png");
+
+  static String imgProfile = img("girl.png");
 
   static String icon(String name) {
     return "assets/icons/$name";

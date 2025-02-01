@@ -23,46 +23,31 @@ class DoctorPatientPageState extends State<DoctorPatientPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Patients for Doctor'),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 15),
-            child: InkWell(
-                onTap: () {
-                  showMyDialog(
-                      context, "Logout", 'Are you sure want to exit the app?',
-                      () {
-                    Get.offAll(() => LoginScreen());
-                  });
-                },
-                child: Icon(
-                  Icons.logout,
-                  color: Colors.red,
-                )),
-          )
-        ],
-      ),
+      appBar: appBarDoctor(context),
       body: Column(
         children: [
-          DropdownButtonFormField<String>(
-            value: selectedFilter,
-            items: [
-              DropdownMenuItem(value: 'false', child: Text('Belum Dilayani')),
-              DropdownMenuItem(value: 'true', child: Text('Sudah Dilayani')),
-            ],
-            onChanged: (value) {
-              setState(() {
-                selectedFilter = value;
-                dokterBloc.add(FilterPatientsByStatus(
-                  selectedFilter!,
-                  widget.doctorId,
-                ));
-              });
-            },
-            decoration: InputDecoration(
-              labelText: 'Status Pelayanan',
-              border: OutlineInputBorder(),
+          hbox(8),
+          Padding(
+            padding: EdgeInsets.only(left: 12, right: 12),
+            child: DropdownButtonFormField<String>(
+              value: selectedFilter,
+              items: [
+                DropdownMenuItem(value: 'false', child: Text('Belum Dilayani')),
+                DropdownMenuItem(value: 'true', child: Text('Sudah Dilayani')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedFilter = value;
+                  dokterBloc.add(FilterPatientsByStatus(
+                    selectedFilter!,
+                    widget.doctorId,
+                  ));
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Status Pelayanan',
+                border: OutlineInputBorder(),
+              ),
             ),
           ),
           Expanded(

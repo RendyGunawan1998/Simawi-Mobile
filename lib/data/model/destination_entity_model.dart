@@ -106,27 +106,30 @@ class DestinationEntity {
 
   factory DestinationEntity.fromJson(Map<String, dynamic> json) =>
       DestinationEntity(
-        id: json["id"],
-        title: json["title"],
-        stemId: json["stemId"],
-        isLeaf: json["isLeaf"],
-        postcoordinationAvailability: json["postcoordinationAvailability"],
-        hasCodingNote: json["hasCodingNote"],
-        hasMaternalChapterLink: json["hasMaternalChapterLink"],
-        hasPerinatalChapterLink: json["hasPerinatalChapterLink"],
+        id: json["id"] ?? '',
+        title: json["title"] ?? '',
+        stemId: json["stemId"] ?? '',
+        isLeaf: json["isLeaf"] ?? '',
+        postcoordinationAvailability:
+            json["postcoordinationAvailability"] ?? '',
+        hasCodingNote: json["hasCodingNote"] ?? '',
+        hasMaternalChapterLink: json["hasMaternalChapterLink"] ?? '',
+        hasPerinatalChapterLink: json["hasPerinatalChapterLink"] ?? '',
         // matchingPVs: List<MatchingPv>.from(
         // json["matchingPVs"].map((x) => MatchingPv.fromJson(x))),
-        propertiesTruncated: json["propertiesTruncated"],
-        isResidualOther: json["isResidualOther"],
-        isResidualUnspecified: json["isResidualUnspecified"],
-        chapter: json["chapter"],
-        theCode: json["theCode"],
-        score: json["score"]?.toDouble(),
-        titleIsASearchResult: json["titleIsASearchResult"],
-        titleIsTopScore: json["titleIsTopScore"],
-        entityType: json["entityType"],
-        important: json["important"],
-        descendants: List<dynamic>.from(json["descendants"].map((x) => x)),
+        propertiesTruncated: json["propertiesTruncated"] ?? '',
+        isResidualOther: json["isResidualOther"] ?? '',
+        isResidualUnspecified: json["isResidualUnspecified"] ?? '',
+        chapter: json["chapter"] ?? '',
+        theCode: json["theCode"] ?? '',
+        score: json["score"]?.toDouble() ?? '',
+        titleIsASearchResult: json["titleIsASearchResult"] ?? '',
+        titleIsTopScore: json["titleIsTopScore"] ?? '',
+        entityType: json["entityType"] ?? '',
+        important: json["important"] ?? '',
+        descendants: json["descendants"] != null
+            ? List<dynamic>.from(json["descendants"])
+            : [],
       );
 
   Map<String, dynamic> toJson() => {

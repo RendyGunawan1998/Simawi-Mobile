@@ -34,7 +34,7 @@ class UpdateDiagnosePatientState extends State<UpdateDiagnosePatient> {
     gejalaController.text = widget.patientHistory['DoctorDiagnose'];
     symtomp.text = widget.patientHistory['Symptoms'];
     diagnosaController.text = widget.patientHistory['DoctorDiagnose'];
-    selectedValue = widget.patientHistory['ICD10Code'];
+    // selectedValue = widget.patientHistory['ICD10Code'];
   }
 
   @override
@@ -42,8 +42,13 @@ class UpdateDiagnosePatientState extends State<UpdateDiagnosePatient> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Update Rekam Medis - Doctor'),
-      ),
+          title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textInter('Update Rekam Medis', Colors.black, FontWeight.w700, 16),
+          textInter('Doctor', Colors.black87, FontWeight.w300, 14),
+        ],
+      )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -92,14 +97,13 @@ class UpdateDiagnosePatientState extends State<UpdateDiagnosePatient> {
                             hbox(4),
                             tff3Line(symtomp, 'Keluhan'),
                             hbox(4),
-                            tffSuffix(
-                                diagnosaController,
-                                'Masukkan Diagnosa Awal',
+                            tffSuffix(diagnosaController, 'Masukkan Diagnosa',
                                 Icons.search, () async {
                               if (diagnosaController.text.isNotEmpty) {
                                 data = await ICDRepository(
                                         icdAPIProvider: ICDAPIProvider())
                                     .searchICD(diagnosaController.text);
+                                print("data :: $data");
                               } else {
                                 Get.snackbar('Alert',
                                     'Please fill something inside the form');
@@ -124,11 +128,10 @@ class UpdateDiagnosePatientState extends State<UpdateDiagnosePatient> {
               data.isEmpty ? hbox(0) : hbox(5),
               data.isEmpty
                   ? hbox(0)
-                  : DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedValue,
-                      hint: Text('Pilih ICD'),
-                      items: data.map((item) {
+                  : dropdownStringRadius(
+                      'Pilih ICD',
+                      selectedValue,
+                      data.map((item) {
                         String displayId = extractId(item.id);
                         var title =
                             item.title.replaceAll("<em class='found'>", '');
@@ -137,24 +140,27 @@ class UpdateDiagnosePatientState extends State<UpdateDiagnosePatient> {
                           value: displayId,
                           child: Text(title),
                         );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedValue = value;
-                        });
-                        print('Selected value: $selectedValue');
-                      },
-                    ),
-              data.isEmpty ? hbox(0) : hbox(10),
-              selectedValue == '' || selectedValue == null || data.isEmpty
-                  ? hbox(0)
-                  : buttonBlue('Tampilkan Deskripsi Penyakit', () {
-                      final diagnosa = diagnosaController.text.trim();
-                      if (diagnosa.isNotEmpty) {
-                        icdBloc.add(
-                            FetchIcdDetailsEvent(selectedValue.toString()));
-                      }
+                      }).toList(), (value) {
+                      setState(() {
+                        selectedValue = value;
+                        final diagnosa = diagnosaController.text.trim();
+                        if (diagnosa.isNotEmpty) {
+                          icdBloc.add(
+                              FetchIcdDetailsEvent(selectedValue.toString()));
+                        } else {
+                          Get.snackbar(
+                              'Choose Diagnose', 'Fill diagnose form first');
+                        }
+                      });
+                      print('Selected value: $selectedValue');
                     }),
+              data.isEmpty ? hbox(0) : hbox(10),
+              // selectedValue == '' || selectedValue == null || data.isEmpty
+              //     ? hbox(0)
+              //     : buttonBlue('Tampilkan Deskripsi Penyakit', () {
+              //         final diagnosa = diagnosaController.text.trim();
+
+              //       }),
               data.isEmpty ? hbox(0) : hbox(10),
               BlocBuilder<IcdBloc, IcdState>(
                 bloc: icdBloc,

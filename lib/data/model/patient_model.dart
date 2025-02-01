@@ -9,8 +9,8 @@ class Patient implements CombinedUserPatient {
   final String phone;
   final String address;
   final String bloodType;
-  final double weight;
-  final double height;
+  final String weight;
+  final String height;
   final String createdAt;
   final String updatedAt;
 
@@ -39,8 +39,8 @@ class Patient implements CombinedUserPatient {
       phone: json['Phone'] as String,
       address: json['Address'] as String,
       bloodType: json['BloodType'] as String,
-      weight: json['Weight'] as double,
-      height: json['Height'] as double,
+      weight: json['Weight'] as String,
+      height: json['Height'] as String,
       createdAt: json['CreatedAt'] as String,
       updatedAt: json['UpdatedAt'] as String,
     );

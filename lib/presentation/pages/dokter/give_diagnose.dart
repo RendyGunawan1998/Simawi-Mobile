@@ -32,6 +32,7 @@ class DiagnosePatientState extends State<DiagnosePatient> {
     super.initState();
     nameController.text = widget.patient.patient!.name;
     gejalaController.text = widget.patientHistory['DoctorDiagnose'];
+    symtomp.text = widget.patientHistory['Symptoms'];
   }
 
   @override
@@ -39,8 +40,13 @@ class DiagnosePatientState extends State<DiagnosePatient> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Rekam Medis - Doctor'),
-      ),
+          title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textInter('Rekam Medis', Colors.black, FontWeight.w700, 16),
+          textInter('Doctor', Colors.black87, FontWeight.w300, 14),
+        ],
+      )),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -88,10 +94,8 @@ class DiagnosePatientState extends State<DiagnosePatient> {
                             ),
                             hbox(4),
                             tff3Line(symtomp, 'Keluhan'),
-                            hbox(4),
-                            tffSuffix(
-                                diagnosaController,
-                                'Masukkan Diagnosa Awal',
+                            hbox(8),
+                            tffSuffix(diagnosaController, 'Masukkan Diagnosa',
                                 Icons.search, () async {
                               if (diagnosaController.text.isNotEmpty) {
                                 data = await ICDRepository(
@@ -113,45 +117,48 @@ class DiagnosePatientState extends State<DiagnosePatient> {
               hbox(15),
               data.isEmpty
                   ? hbox(0)
-                  : Text(
-                      'ICD',
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  : Padding(
+                      padding: EdgeInsets.all(6),
+                      child:
+                          textInter('ICD', Colors.black, FontWeight.w600, 16),
                     ),
               data.isEmpty ? hbox(0) : hbox(5),
               data.isEmpty
                   ? hbox(0)
-                  : DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedValue,
-                      hint: Text('Pilih ICD'),
-                      items: data.map((item) {
-                        String displayId = extractId(item.id);
-                        var title =
-                            item.title.replaceAll("<em class='found'>", '');
-                        title = title.replaceAll("</em>", '');
-                        return DropdownMenuItem<String>(
-                          value: displayId,
-                          child: Text(title),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
+                  : Padding(
+                      padding: EdgeInsets.all(6),
+                      child: dropdownStringRadius(
+                          'Pilih ICD',
+                          selectedValue,
+                          data.map((item) {
+                            String displayId = extractId(item.id);
+                            var title =
+                                item.title.replaceAll("<em class='found'>", '');
+                            title = title.replaceAll("</em>", '');
+                            return DropdownMenuItem<String>(
+                              value: displayId,
+                              child: Text(title),
+                            );
+                          }).toList(), (value) {
                         setState(() {
                           selectedValue = value;
+                          final diagnosa = diagnosaController.text.trim();
+                          if (diagnosa.isNotEmpty) {
+                            icdBloc.add(
+                                FetchIcdDetailsEvent(selectedValue.toString()));
+                          } else {
+                            Get.snackbar(
+                                'Choose Diagnose', 'Fill diagnose form first');
+                          }
                         });
                         print('Selected value: $selectedValue');
-                      },
-                    ),
-              data.isEmpty ? hbox(0) : hbox(10),
-              selectedValue == null || selectedValue == ""
-                  ? hbox(0)
-                  : buttonBlue('Tampilkan Deskripsi Penyakit', () {
-                      final diagnosa = diagnosaController.text.trim();
-                      if (diagnosa.isNotEmpty) {
-                        icdBloc.add(
-                            FetchIcdDetailsEvent(selectedValue.toString()));
-                      }
-                    }),
+                      })),
+              // data.isEmpty ? hbox(0) : hbox(10),
+              // selectedValue == null || selectedValue == ""
+              //     ? hbox(0)
+              //     : buttonBlue('Tampilkan Deskripsi Penyakit', () {
+
+              //       }),
               data.isEmpty ? hbox(0) : hbox(10),
               BlocBuilder<IcdBloc, IcdState>(
                 bloc: icdBloc,
@@ -160,37 +167,43 @@ class DiagnosePatientState extends State<DiagnosePatient> {
                     final icdData = state.icdDetails;
                     return Column(
                       children: [
-                        Container(
-                          width: Get.width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.grey[200],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Judul: ${icdData['title']['@value']}'),
-                                hbox(10),
-                                icdData['definition'] == null
-                                    ? hbox(0)
-                                    : Text(
-                                        'Deskripsi: ${icdData['definition']['@value']}'),
-                                icdData['definition'] == null
-                                    ? hbox(0)
-                                    : hbox(10),
-                                icdData['synonym'] == null
-                                    ? hbox(0)
-                                    : Text(
-                                        'Sinonym: ${icdData['synonym'].map((e) => e['label']['@value']).join(', ')}'),
-                                icdData['synonym'] == null ? hbox(0) : hbox(10),
-                                Text(
-                                    'Child: ${(icdData['child'] as List?)?.join(', ').replaceAll('http://id.who.int/icd/entity/', '') ?? 'No child entities'}'),
-                                hbox(10),
-                                Text(
-                                    'Parent: ${(icdData['parent'] as List?)?.join(', ').replaceAll('http://id.who.int/icd/entity/', '') ?? 'No parent entities'}'),
-                              ],
+                        Padding(
+                          padding: EdgeInsets.only(left: 4, right: 4),
+                          child: Container(
+                            width: Get.width,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.grey[200],
+                                border: Border.all(
+                                    color: Colors.black87, width: 0.4)),
+                            child: Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Judul: ${icdData['title']['@value']}'),
+                                  hbox(10),
+                                  icdData['definition'] == null
+                                      ? hbox(0)
+                                      : Text(
+                                          'Deskripsi: ${icdData['definition']['@value']}'),
+                                  icdData['definition'] == null
+                                      ? hbox(0)
+                                      : hbox(10),
+                                  icdData['synonym'] == null
+                                      ? hbox(0)
+                                      : Text(
+                                          'Sinonym: ${icdData['synonym'].map((e) => e['label']['@value']).join(', ')}'),
+                                  icdData['synonym'] == null
+                                      ? hbox(0)
+                                      : hbox(10),
+                                  Text(
+                                      'Child: ${(icdData['child'] as List?)?.join(', ').replaceAll('http://id.who.int/icd/entity/', '') ?? 'No child entities'}'),
+                                  hbox(10),
+                                  Text(
+                                      'Parent: ${(icdData['parent'] as List?)?.join(', ').replaceAll('http://id.who.int/icd/entity/', '') ?? 'No parent entities'}'),
+                                ],
+                              ),
                             ),
                           ),
                         ),

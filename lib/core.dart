@@ -11,3 +11,5 @@ export 'package:equatable/equatable.dart';
 export 'dart:convert';
 export 'package:flutter/material.dart';
 export 'package:uuid/uuid.dart';
+export 'package:hexcolor/hexcolor.dart';
+export 'package:pie_chart/pie_chart.dart';

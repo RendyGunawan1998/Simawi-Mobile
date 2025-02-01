@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pie_chart/pie_chart.dart';
-
 import '../../core.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -23,8 +21,13 @@ class DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard'),
-      ),
+          title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textInter('Dashboard', Colors.black, FontWeight.w700, 16),
+          textInter('Admin', Colors.black87, FontWeight.w300, 14),
+        ],
+      )),
       body: BlocBuilder<DashboardBloc, DashboardState>(
         bloc: dashboardBloc,
         builder: (context, state) {
@@ -34,26 +37,19 @@ class DashboardPageState extends State<DashboardPage> {
 
           if (state is DashboardSuccess) {
             return Padding(
-              padding: EdgeInsets.all(16.0),
-              child: ListView(
-                children: [
-                  Text(
-                    '5 Kode Diagnosis ICD-10 Terpopuler:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              padding: EdgeInsets.all(12.0),
+              child: Container(
+                height: Get.height,
+                width: Get.width,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      paddingOverview(state),
+                      paddingPasienCount(state),
+                      paddingPasienSaatIni(state)
+                    ],
                   ),
-                  hbox(10),
-                  Container(
-                    height: 300,
-                    width: 300,
-                    child: PieChart(
-                      dataMap: getDataMap(state.topICDCodes),
-                      chartType: ChartType.disc,
-                      chartValuesOptions:
-                          ChartValuesOptions(showChartValues: true),
-                      legendOptions: LegendOptions(showLegends: true),
-                    ),
-                  )
-                ],
+                ),
               ),
             );
           }
@@ -62,13 +58,5 @@ class DashboardPageState extends State<DashboardPage> {
         },
       ),
     );
-  }
-
-  Map<String, double> getDataMap(List<ICD10Diagnosis> topICDCodes) {
-    Map<String, double> dataMap = {};
-    for (var icd in topICDCodes) {
-      dataMap[icd.icd10Code] = icd.count.toDouble();
-    }
-    return dataMap;
   }
 }

@@ -13,13 +13,12 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     emit(DashboardLoading());
     try {
       print('call dashboard bloc');
-
+      final patientCount = await repo.getPatientCount();
+      final recentPatients = await repo.getRecentPatients();
       final topICDCodes = await repo.getTopICDCodes();
 
       print('topICDCodes :: $topICDCodes');
-      emit(DashboardSuccess(
-        topICDCodes: topICDCodes,
-      ));
+      emit(DashboardSuccess(patientCount, recentPatients, topICDCodes));
     } catch (e) {
       emit(DashboardFailure('Failed to load dashboard data: $e'));
     }

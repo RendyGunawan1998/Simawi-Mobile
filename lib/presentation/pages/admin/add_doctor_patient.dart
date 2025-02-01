@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:intl/intl.dart';
 import '../../../core.dart';
 
 class AddPatientDoctorPage extends StatefulWidget {
@@ -13,222 +10,90 @@ class AddPatientDoctorPage extends StatefulWidget {
 
 class _AddPatientDoctorPageState extends State<AddPatientDoctorPage> {
   PatientBloc patientBloc = PatientBloc(PatientRepository());
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _diagnosisController = TextEditingController();
+  final TextEditingController symptoms = TextEditingController();
+  final TextEditingController diagnosisController = TextEditingController();
 
-  String? selectedValue;
-  String? _selectedGender;
-  DateTime? _selectedDate;
+  bool see = false;
   int? selectedDoctorId;
-
   List<UserModel> _doctors = [];
-  List<DestinationEntity> data = [];
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.patient.name;
     callData();
   }
 
   callData() async {
     _doctors = await PatientRepository().getDoctorDropdown();
+    selectedDoctorId = await PatientRepository()
+        .getDoctorByPatientId(widget.patient.recordNumber);
     setState(() {});
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _ageController.dispose();
-    _diagnosisController.dispose();
-    super.dispose();
-  }
-
   void submitForm(BuildContext context) {
-    final name = _nameController.text.trim();
-    final age = int.tryParse(_ageController.text.trim()) ?? 0;
-    final gender = _selectedGender;
-    final diagnosis = _diagnosisController.text.trim();
-    final date = _selectedDate != null
-        ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-        : null;
-    final doctor = selectedDoctorId;
-
-    if (name.isEmpty ||
-        age <= 0 ||
-        gender == null ||
-        diagnosis.isEmpty ||
-        date == null ||
-        doctor == null) {
-      Get.snackbar('Alert', 'Please fill all the form');
-      return;
-    }
-
-    Random random = Random();
-
-    int record = random.nextInt(1500) * 50;
-
-    final newPatient = Patient(
-      id: widget.patient.id,
-      recordNumber: record,
-      name: name,
-      birth: '',
-      nik: '',
-      phone: '',
-      address: '',
-      bloodType: '',
-      weight: 0.0,
-      height: 0.0,
-      createdAt: date,
-      updatedAt: date,
-    );
-    print('doctor :: $doctor');
-
+    final newPatient = PatientHistory(
+        id: widget.patient.id,
+        recordNumber: widget.patient.recordNumber,
+        consultationBy: selectedDoctorId!,
+        dateVisit: DateTime.now(),
+        doctorDiagnose: diagnosisController.text,
+        icd10Code: "Wait doctor diagnose",
+        icd10Name: "Wait doctor diagnose",
+        isDone: false,
+        registeredBy: 1,
+        symptoms: symptoms.text);
     print('newPatient :: ${newPatient.toJson()}');
-    patientBloc.add(AddPatient(newPatient, doctor, 1, _diagnosisController.text,
-        DateFormat('dd MMM yyyy').format(_selectedDate!)));
-    Get.snackbar('Success', 'Patient data success added');
+    patientBloc.add(AddAppointmentPatient(newPatient));
+    Get.snackbar('Success', 'Appointment for patient successfull added');
     patientBloc.add(LoadPatients());
     Get.offAll(() => AdminPage());
-  }
-
-  Future<void> selectDate(BuildContext context) async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Patient'),
-        centerTitle: true,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            textInter('Appointment Doctor', Colors.black, FontWeight.w600, 16),
+            textInter('Admin', Colors.black87, FontWeight.w400, 12),
+          ],
+        ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(10.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
               hbox(15),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: tffType(_ageController, 'Age', TextInputType.number),
-                  ),
-                  wbox(10),
-                  Expanded(
-                    flex: 5,
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedGender,
-                      items: [
-                        DropdownMenuItem(value: 'Male', child: Text('Male')),
-                        DropdownMenuItem(
-                            value: 'Female', child: Text('Female')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedGender = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Gender',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              hbox(15),
-              tffSuffix(
-                  _diagnosisController, 'Diagnosis (ICD-10)', Icons.search,
-                  () async {
-                data = await ICDRepository(icdAPIProvider: ICDAPIProvider())
-                    .searchICD(_diagnosisController.text);
-                setState(() {});
+              paddingDataPasien(widget.patient, see, () {
+                setState(() {
+                  see = !see;
+                });
+              }),
+              hbox(20),
+              tff3Line(symptoms, 'Symtomps/Gejala'),
+              hbox(10),
+              tfOutlineBorder('Diagnosis Awal', diagnosisController),
+              hbox(10),
+              dropdownInt(
+                  'Doctor',
+                  selectedDoctorId,
+                  _doctors.map((doctor) {
+                    return DropdownMenuItem<int>(
+                      value: doctor.id!,
+                      child: Text(doctor.name),
+                    );
+                  }).toList(), (value) {
+                setState(() {
+                  selectedDoctorId = value;
+                });
               }),
               hbox(15),
-              data.isEmpty
-                  ? hbox(0)
-                  : DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedValue,
-                      hint: Text('Pilih ICD'),
-                      items: data.map((item) {
-                        String displayId = extractId(item.id);
-                        var title =
-                            item.title.replaceAll("<em class='found'>", '');
-                        title = title.replaceAll("</em>", '');
-                        return DropdownMenuItem<String>(
-                          value: displayId,
-                          child: Text(title),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedValue = value;
-                        });
-                        print('Selected value: $selectedValue');
-                      },
-                    ),
-              data.isEmpty ? hbox(0) : hbox(15),
-              GestureDetector(
-                onTap: () {
-                  selectDate(context);
-                },
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Examination Date',
-                    border: OutlineInputBorder(),
-                  ),
-                  child: Text(
-                    _selectedDate != null
-                        ? DateFormat('dd MMM yyyy').format(_selectedDate!)
-                        : 'Select Date',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              hbox(15),
-              DropdownButtonFormField<int>(
-                value: selectedDoctorId,
-                items: _doctors.map((doctor) {
-                  return DropdownMenuItem<int>(
-                    value: doctor.id!,
-                    child: Text(doctor.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedDoctorId = value;
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Doctor',
-                  border: OutlineInputBorder(),
-                ),
-              ),
               hbox(35),
-              buttonBlue('Add Patient', () {
+              buttonBlue('Add Doctor', () {
                 submitForm(context);
               }),
             ],
